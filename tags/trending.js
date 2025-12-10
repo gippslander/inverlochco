@@ -67,7 +67,7 @@ window.GIPPS_TRENDING_TAGS = [
   },
   { 
     label: "Trades", 
-    href: "/jobs/trades-and-services", 
+    href: "/jobs/construction-and-trades", 
     type: 'work', 
     weight: 7 
   },
