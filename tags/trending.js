@@ -45,29 +45,47 @@ window.GIPPS_TRENDING_TAGS = [
     type: 'loc', 
     weight: 6 
   },
+  { 
+    label: "Inverloch", 
+    href: "/jobs/in-bairnsdale-victoria-australia", 
+    type: 'loc', 
+    weight: 8 
+  },
+  { 
+    label: "Wonthaggi", 
+    href: "/jobs/in-wonthaggi-victoria-australia", 
+    type: 'loc', 
+    weight: 8 
+  },  
 
   // --- JOB CATEGORIES ---
   { 
-    label: "Retail & Hospitality", 
+    label: "Retail", 
     href: "/jobs/retail-and-hospitality", 
     type: 'gen', 
-    weight: 5 
+    weight: 9 
   },
   { 
     label: "Healthcare", 
     href: "/jobs/healthcare-and-medical", 
     type: 'gen', 
-    weight: 9 
+    weight: 2 
   },
   { 
     label: "Education", 
     href: "/jobs/education-and-training", 
     type: 'edu', 
-    weight: 7 
+    weight: 1 
   },
   { 
     label: "Trades", 
     href: "/jobs/construction-and-trades", 
+    type: 'work', 
+    weight: 7 
+  },
+    { 
+    label: "Cleaner", 
+    href: "/jobs/maintenance-and-cleaning", 
     type: 'work', 
     weight: 7 
   },
