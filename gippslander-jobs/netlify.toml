@@ -1,7 +1,15 @@
 [build]
   functions = "netlify/functions"
+  publish = "."  # This allows v1.js to be hosted at the root
+
+# This creates your clean URL path
+[[redirects]]
+  from = "/get-jobs"
+  to = "/.netlify/functions/get-jobs"
+  status = 200
 
 [[headers]]
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTION"
