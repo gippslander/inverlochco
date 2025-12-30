@@ -1,23 +1,8 @@
 (async () => {
-    // 1. More robust way to find the script tag
-    const scripts = document.getElementsByTagName('script');
-    let scriptTag = document.currentScript;
-    
-    if (!scriptTag) {
-        // Fallback: search for the script by its filename
-        scriptTag = Array.from(scripts).find(s => s.src.includes('v1.js'));
-    }
-
-    if (!scriptTag) {
-        console.error("Gippslander Widget: Could not find script tag to anchor to.");
-        return;
-    }
-
+    const scriptTag = document.currentScript;
     const locations = scriptTag.getAttribute('loc') || 'Inverloch';
-    const brandColor = scriptTag.getAttribute('btn-color') || '#a39c8e';
     const API_URL = `https://cdn.gippslander.com.au/get-jobs?loc=${encodeURIComponent(locations)}`;
 
-    // 2. Create the container immediately before fetching
     const container = document.createElement('div');
     container.style.cssText = `
         font-family: 'Inter', -apple-system, system-ui, sans-serif;
@@ -28,7 +13,6 @@
         box-sizing: border-box;
     `;
     scriptTag.parentNode.insertBefore(container, scriptTag);
-    container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">Loading jobs...</div>`;
 
     try {
         const response = await fetch(API_URL);
@@ -39,7 +23,6 @@
             return;
         }
 
-        // 3. Clear the loading message and build UI
         container.innerHTML = `
             <style>
                 .gipps-search-container { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
@@ -47,16 +30,16 @@
                     flex-grow: 1; padding: 14px 22px; border-radius: 50px; border: 1px solid #e2e8f0; 
                     font-size: 15px; outline: none; background: #f8fafc; transition: all 0.2s;
                 }
-                .gipps-search-input:focus { border-color: ${brandColor}; background: #fff; }
+                .gipps-search-input:focus { border-color: #a39c8e; background: #fff; }
                 .gipps-post-btn { 
-                    background: ${brandColor}; color: white !important; text-decoration: none; padding: 14px 28px; 
+                    background: #a39c8e; color: white; text-decoration: none; padding: 14px 28px; 
                     border-radius: 50px; font-weight: 700; font-size: 14px; white-space: nowrap; transition: opacity 0.2s;
                 }
                 .gipps-post-btn:hover { opacity: 0.9; }
                 .gipps-card { 
                     background: #fff; border: 1px solid #f1f5f9; border-radius: 16px; padding: 24px; 
                     margin-bottom: 16px; display: flex; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
-                    transition: all 0.2s ease; text-decoration: none; color: inherit;
+                    transition: all 0.2s ease;
                 }
                 .gipps-card:hover { border-color: #cbd5e1; transform: translateY(-1px); }
                 .gipps-meta-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
@@ -68,9 +51,10 @@
                     background: #ecfdf5; color: #065f46; border: 1px solid #d1fae5;
                 }
                 .gipps-apply-btn { 
-                    background: ${brandColor}; color: white !important; text-decoration: none; padding: 12px 32px; 
+                    background: #a39c8e; color: white; text-decoration: none; padding: 12px 32px; 
                     border-radius: 8px; font-weight: 700; font-size: 14px; margin-left: auto; transition: background 0.2s;
                 }
+                .gipps-apply-btn:hover { background: #8e8779; }
                 @media (max-width: 600px) {
                     .gipps-card { flex-direction: column; text-align: center; }
                     .gipps-apply-btn { margin-left: 0; margin-top: 20px; width: 100%; box-sizing: border-box; }
@@ -81,7 +65,7 @@
             </style>
             
             <div class="gipps-search-container">
-                <input type="text" class="gipps-search-input" id="gippsSearch" placeholder="Search jobs...">
+                <input type="text" class="gipps-search-input" id="gippsSearch" placeholder="Search jobs (e.g. Barista, Nurse)...">
                 <a href="https://gippslander.com.au/post-a-job" target="_blank" class="gipps-post-btn">Post a Job</a>
             </div>
 
@@ -108,9 +92,15 @@
             jobListContainer.innerHTML = filteredJobs.map(job => {
                 const jobType = job.job_type?.name || 'Full-time';
                 const locationLabel = job.location ? job.location.split(',')[0] : 'Gippsland';
-                const salaryHtml = (job.salary_min || job.salary_max) 
-                    ? `<span class="gipps-badge gipps-badge-salary">$${job.salary_min || ''}${job.salary_max ? ' - $'+job.salary_max : ''}</span>` 
-                    : '';
+                
+                // Logic for Salary Badge
+                let salaryHtml = '';
+                if (job.salary_min || job.salary_max) {
+                    const salaryText = job.salary_min && job.salary_max 
+                        ? `$${job.salary_min} - $${job.salary_max}` 
+                        : `$${job.salary_min || job.salary_max}`;
+                    salaryHtml = `<span class="gipps-badge gipps-badge-salary">${salaryText}</span>`;
+                }
 
                 return `
                 <div class="gipps-card">
@@ -119,23 +109,25 @@
                         <div style="font-weight: 700; font-size: 19px; color: #0f172a; margin-bottom: 2px;">${job.title}</div>
                         <div style="font-size: 15px; color: #64748b;">${job.employer.name}</div>
                         <div class="gipps-meta-container">
-                            <span class="gipps-badge">${locationLabel}, VIC</span>
+                            <span class="gipps-badge">${locationLabel}, Victoria, Australia</span>
                             <span class="gipps-badge">${jobType}</span>
                             ${salaryHtml}
                         </div>
                     </div>
                     <a href="${job.job_details_url}" target="_blank" class="gipps-apply-btn">Apply</a>
-                </div>`;
-            }).join('');
+                </div>
+            `}).join('');
         };
 
         renderJobs(allJobs);
+
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            renderJobs(allJobs.filter(j => 
-                j.title.toLowerCase().includes(term) || 
-                j.employer.name.toLowerCase().includes(term)
-            ));
+            const filtered = allJobs.filter(job => 
+                job.title.toLowerCase().includes(term) || 
+                job.employer.name.toLowerCase().includes(term)
+            );
+            renderJobs(filtered);
         });
 
     } catch (e) {
